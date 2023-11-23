@@ -14,7 +14,7 @@
 
 // NOLINTBEGIN(readability-identifier-naming)
 
-#include "lanelet2_extension/regulatory_elements/crosswalk.hpp"
+#include "lanelet2_extension/regulatory_elements/roundabout.hpp"
 
 #include <boost/variant.hpp>
 
@@ -53,20 +53,42 @@ Optional<T> tryGetFront(const std::vector<T> & vec)
   return vec.front();
 }
 
-RegulatoryElementDataPtr constructCrosswalk(
-  Id id, const AttributeMap & attributes, const Lanelet & crosswalkLanelet,
-  const Polygon3d & crosswalkArea, const LineStrings3d & stopLine)
+Polygons3d getPoly(const RuleParameterMap & paramsMap, RoleName role)
+{
+  auto params = paramsMap.find(role);
+  if (params == paramsMap.end()) {
+    return {};
+  }
+
+  Polygons3d result;
+  for (auto & param : params->second) {
+    auto p = boost::get<Polygon3d>(&param);
+    if (p != nullptr) {
+      result.push_back(*p);
+    }
+  }
+  return result;
+}
+
+ConstPolygons3d getConstPoly(const RuleParameterMap & params, RoleName role)
+{
+  auto cast_func = [](auto & poly) { return static_cast<ConstPolygon3d>(poly); };
+  return utils::transform(getPoly(params, role), cast_func);
+}
+RegulatoryElementDataPtr constructRoundabout(
+  Id id, const AttributeMap & attributes, const Lanelet & roundaboutLanelet,
+  const Polygon3d & roundaboutArea, const LineStrings3d & stopLine)
 {
   RuleParameterMap rpm;
 
   {
-    RuleParameters rule_parameters = {crosswalkArea};
+    RuleParameters rule_parameters = {roundaboutArea};
     rpm.insert(
-      std::make_pair(Crosswalk::AutowareRoleNameString::CrosswalkPolygon, rule_parameters));
+      std::make_pair(Roundabout::AutowareRoleNameString::RoundaboutPolygon, rule_parameters));
   }
 
   {
-    RuleParameters rule_parameters = {crosswalkLanelet};
+    RuleParameters rule_parameters = {roundaboutLanelet};
     rpm.insert(std::make_pair(RoleNameString::Refers, rule_parameters));
   }
 
@@ -77,45 +99,45 @@ RegulatoryElementDataPtr constructCrosswalk(
 
   auto data = std::make_shared<RegulatoryElementData>(id, std::move(rpm), attributes);
   data->attributes[AttributeName::Type] = AttributeValueString::RegulatoryElement;
-  data->attributes[AttributeName::Subtype] = "crosswalk";
+  data->attributes[AttributeName::Subtype] = "roundabout";
   return data;
 }
 }  // namespace
 
-Crosswalk::Crosswalk(const RegulatoryElementDataPtr & data) : RegulatoryElement(data)
+Roundabout::Roundabout(const RegulatoryElementDataPtr & data) : RegulatoryElement(data)
 {
 }
 
-Crosswalk::Crosswalk(
-  Id id, const AttributeMap & attributes, const Lanelet & crosswalk_lanelet,
-  const Polygon3d & crosswalk_area, const LineStrings3d & stop_line)
-: Crosswalk(constructCrosswalk(id, attributes, crosswalk_lanelet, crosswalk_area, stop_line))
+Roundabout::Roundabout(
+  Id id, const AttributeMap & attributes, const Lanelet & roundabout_lanelet,
+  const Polygon3d & roundabout_area, const LineStrings3d & stop_line)
+: Roundabout(constructRoundabout(id, attributes, roundabout_lanelet, roundabout_area, stop_line))
 {
 }
 
-ConstPolygons3d Crosswalk::crosswalkAreas() const
+ConstPolygon3d Roundabout::roundaboutArea() const
 {
-  return getParameters<ConstPolygon3d>(AutowareRoleNameString::CrosswalkPolygon);
+  return getConstPoly(parameters(), RoleName::Refers).front();
 }
 
-ConstLineStrings3d Crosswalk::stopLines() const
+ConstLineStrings3d Roundabout::stopLines() const
 {
   return getParameters<ConstLineString3d>(RoleName::RefLine);
 }
 
-ConstLanelet Crosswalk::crosswalkLanelet() const
+ConstLanelet Roundabout::roundaboutLanelet() const
 {
   return getParameters<ConstLanelet>(RoleName::Refers).front();
 }
 
-void Crosswalk::addCrosswalkArea(const Polygon3d & primitive)
+void Roundabout::addRoundaboutArea(const Polygon3d & primitive)
 {
-  parameters()["crosswalk"].emplace_back(primitive);
+  parameters()["roundabout"].emplace_back(primitive);
 }
 
-bool Crosswalk::removeCrosswalkArea(const Polygon3d & primitive)
+bool Roundabout::removeRoundaboutArea(const Polygon3d & primitive)
 {
-  return findAndErase(primitive, &parameters().find("crosswalk")->second);
+  return findAndErase(primitive, &parameters().find("roundabout")->second);
 }
 }  // namespace lanelet::autoware
 

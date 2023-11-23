@@ -20,6 +20,7 @@
 
 #include "lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp"
 #include "lanelet2_extension/regulatory_elements/crosswalk.hpp"
+#include "lanelet2_extension/regulatory_elements/roundabout.hpp"
 #include "lanelet2_extension/regulatory_elements/detection_area.hpp"
 #include "lanelet2_extension/regulatory_elements/no_parking_area.hpp"
 #include "lanelet2_extension/regulatory_elements/no_stopping_area.hpp"
@@ -303,6 +304,34 @@ std::vector<lanelet::CrosswalkConstPtr> query::crosswalks(const lanelet::ConstLa
     }
   }
   return cw_reg_elems;
+}
+
+std::vector<lanelet::RoundaboutConstPtr> query::roundabouts(const lanelet::ConstLanelets & lanelets)
+{
+  std::vector<lanelet::RoundaboutConstPtr> ra_reg_elems;
+
+  for (const auto & ll : lanelets) {
+    std::vector<lanelet::RoundaboutConstPtr> ll_ra_re =
+      ll.regulatoryElementsAs<lanelet::autoware::Roundabout>();
+
+    // insert unique id into array
+    for (const auto & ra_ptr : ll_ra_re) {
+      lanelet::Id id = ra_ptr->id();
+      bool unique_id = true;
+
+      for (const auto & ra_reg_elem : ra_reg_elems) {
+        if (id == ra_reg_elem->id()) {
+          unique_id = false;
+          break;
+        }
+      }
+
+      if (unique_id) {
+        ra_reg_elems.push_back(ra_ptr);
+      }
+    }
+  }
+  return ra_reg_elems;
 }
 
 lanelet::ConstLineStrings3d query::curbstones(const lanelet::LaneletMapConstPtr & lanelet_map_ptr)

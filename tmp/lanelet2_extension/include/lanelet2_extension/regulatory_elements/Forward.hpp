@@ -31,6 +31,7 @@ class DetectionArea;
 class NoParkingArea;
 class NoStoppingArea;
 class RoadMarking;
+class Roundabout;
 class SpeedBump;
 class VirtualTrafficLight;
 
@@ -47,6 +48,7 @@ using NoStoppingAreaConstPtr = std::shared_ptr<const lanelet::autoware::NoStoppi
 using NoParkingAreaConstPtr = std::shared_ptr<const lanelet::autoware::NoParkingArea>;
 using SpeedBumpConstPtr = std::shared_ptr<const lanelet::autoware::SpeedBump>;
 using CrosswalkConstPtr = std::shared_ptr<const lanelet::autoware::Crosswalk>;
+using RoundaboutConstPtr = std::shared_ptr<const lanelet::autoware::Roundabout>;
 }  // namespace lanelet
 
 // NOLINTEND(readability-identifier-naming)

@@ -25,6 +25,7 @@
 #include "lanelet2_extension/regulatory_elements/no_parking_area.hpp"
 #include "lanelet2_extension/regulatory_elements/no_stopping_area.hpp"
 #include "lanelet2_extension/regulatory_elements/speed_bump.hpp"
+#include "lanelet2_extension/regulatory_elements/roundabout.hpp"
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -128,6 +129,13 @@ std::vector<lanelet::SpeedBumpConstPtr> speedBumps(const lanelet::ConstLanelets 
  * @return         [crosswalks that are associated with input lanelets]
  */
 std::vector<lanelet::CrosswalkConstPtr> crosswalks(const lanelet::ConstLanelets & lanelets);
+
+/**
+ * [crosswalks extracts Roundabout regulatory elements from lanelets]
+ * @param lanelets [input lanelets]
+ * @return         [roundabouts that are associated with input lanelets]
+ */
+std::vector<lanelet::RoundaboutConstPtr> roundabouts(const lanelet::ConstLanelets & lanelets);
 
 // query all curbstones in lanelet2 map
 lanelet::ConstLineStrings3d curbstones(const lanelet::LaneletMapConstPtr & lanelet_map_ptr);

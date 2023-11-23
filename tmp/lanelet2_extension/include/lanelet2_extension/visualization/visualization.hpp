@@ -263,6 +263,15 @@ visualization_msgs::msg::MarkerArray crosswalkAreasAsMarkerArray(
   const rclcpp::Duration & duration = rclcpp::Duration(0, 0));
 
 /**
+ * [roundaboutAreasAsMarkerArray creates marker array to visualize roundabout regulatory element]
+ * @param  sb_reg_elems [roundabout regulatory elements]
+ * @param  c            [color of the marker]
+ * @param  duration     [lifetime of the marker]
+ */
+visualization_msgs::msg::MarkerArray roundaboutAreasAsMarkerArray(
+  const std::vector<lanelet::RoundaboutConstPtr> & ra_reg_elems, const std_msgs::msg::ColorRGBA & c,
+  const rclcpp::Duration & duration = rclcpp::Duration(0, 0));
+/**
  * [pedestrianMarkingsAsMarkerArray creates marker array to visualize pedestrian markings]
  * @param  pedestrian_markings [pedestrian marking polygon]
  * @param  c            [color of the marker]
